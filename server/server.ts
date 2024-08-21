@@ -1,6 +1,10 @@
 import { ApolloServer } from "@apollo/server";
 import { startStandaloneServer } from "@apollo/server/standalone";
 import gql from "graphql-tag";
+import connectDB from "./database"; // Import the connection function
+import Post from "./Post"; // Import your Mongoose Post model
+
+connectDB();
 
 type Post = {
   id: string;
@@ -23,28 +27,21 @@ const typeDefs = gql`
 
   type Query {
     posts: [Post]
-    post(id: ID!): Post
   }
 `;
-
-// TODO -> move to database, create a seeder for the 300 posts
-const posts: Post[] = [
-  { id: "1", title: "First Post", content: "This is the first post", order: 1 },
-  {
-    id: "2",
-    title: "Second Post",
-    content: "This is the second post",
-    order: 2,
-  },
-];
 
 // Resolvers define how to fetch the types defined in your schema.
 // This resolver retrieves posts from the "posts" array defined above.
 const resolvers = {
   Query: {
-    posts: () => posts, // Retrieves all posts from the "posts" array.
-    post: (_: any, { id }: { id: string }) =>
-      posts.find((post) => post.id === id), // Retrieves a single post by its ID from the "posts" array.
+    posts: async () => {
+      try {
+        return await Post.find();
+      } catch (err) {
+        console.log(err);
+        throw new Error("failed to fetch posts");
+      }
+    },
   },
 };
 

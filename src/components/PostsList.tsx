@@ -36,7 +36,9 @@ const Item = styled(Paper)(({ theme }) => ({
 }));
 
 const PostsList: React.FC = () => {
-  const { loading, error, data } = useQuery<GetPostsData>(GET_POSTS);
+  const { loading, error, data } = useQuery<GetPostsData>(GET_POSTS, {
+    fetchPolicy: "no-cache",
+  });
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;
