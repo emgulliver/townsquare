@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "rootDirs": ["src"],
+    "rootDirs": ["src", "server"],
     "outDir": "dist",
     "lib": ["es2020", "dom"],
     "target": "es2020",
@@ -10,8 +10,8 @@
     "jsx": "react-jsx",
     "types": ["node"],
     "skipLibCheck": true,
-    "strict": true //
+    "strict": true
   },
-  "include": ["src", "server/**/*.ts"],
+  "include": ["src/**/*.ts", "src/**/*.tsx", "server/**/*.ts", "*.ts"],
   "exclude": ["node_modules"]
 }

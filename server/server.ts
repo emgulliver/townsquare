@@ -1,22 +1,11 @@
 import { ApolloServer } from "@apollo/server";
 import { startStandaloneServer } from "@apollo/server/standalone";
 import gql from "graphql-tag";
-import connectDB from "./database"; // Import the connection function
-import Post from "./Post"; // Import your Mongoose Post model
+import connectDB from "./database.js"; 
+import seedPosts from "./seeder.js";
+import Post from "./Post.js"; 
 
-connectDB();
-
-type Post = {
-  id: string;
-  title: string;
-  content: string;
-  order: number;
-};
-
-// A schema is a collection of type definitions (hence "typeDefs")
-// that together define the "shape" of queries that are executed against
-// your data.
-
+// Define the GraphQL schema
 const typeDefs = gql`
   type Post {
     id: ID!
@@ -30,34 +19,40 @@ const typeDefs = gql`
   }
 `;
 
-// Resolvers define how to fetch the types defined in your schema.
-// This resolver retrieves posts from the "posts" array defined above.
+// Define the resolvers
 const resolvers = {
   Query: {
     posts: async () => {
       try {
-        return await Post.find();
+        return await Post.find(); 
       } catch (err) {
-        console.log(err);
-        throw new Error("failed to fetch posts");
+        console.log("Error fetching posts:", err);
+        throw new Error("Failed to fetch posts");
       }
     },
   },
 };
 
-// The ApolloServer constructor requires two parameters: your schema
-// definition and your set of resolvers.
-const server = new ApolloServer({
-  typeDefs,
-  resolvers,
-});
+// Start the server and run the seeder
+const startServer = async () => {
+  try {
+    await connectDB();
+    await seedPosts(); 
 
-// Passing an ApolloServer instance to the `startStandaloneServer` function:
-//  1. creates an Express app
-//  2. installs your ApolloServer instance as middleware
-//  3. prepares your app to handle incoming requests
-const { url } = await startStandaloneServer(server, {
-  listen: { port: 4000 },
-});
+    const server = new ApolloServer({
+      typeDefs,
+      resolvers,
+    });
 
-console.log(`🚀  Server ready at: ${url}`);
+    const { url } = await startStandaloneServer(server, {
+      listen: { port: 4000 },
+    });
+
+    console.log(`🚀 Server ready at: ${url}`);
+  } catch (err) {
+    console.error("Error starting server:", err);
+    process.exit(1);
+  }
+};
+
+startServer(); // Execute the function to start the server and seed the database
