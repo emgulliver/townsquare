@@ -1,11 +1,11 @@
 import { ApolloServer } from "@apollo/server";
 import { startStandaloneServer } from "@apollo/server/standalone";
 import gql from "graphql-tag";
-import connectDB from "./database.js"; 
+import connectDB from "./database.js";
 import seedPosts from "./seeder.js";
-import Post from "./Post.js"; 
+import Post from "./Post.js";
 
-// Define the GraphQL schema
+// Define the GraphQL schema - for a larger project I would move typedefs to a seperate file
 const typeDefs = gql`
   type Post {
     id: ID!
@@ -19,12 +19,12 @@ const typeDefs = gql`
   }
 `;
 
-// Define the resolvers
+// Define the resolvers -> for a larger project, I would break this out into a resolver file
 const resolvers = {
   Query: {
     posts: async () => {
       try {
-        return await Post.find(); 
+        return await Post.find();
       } catch (err) {
         console.log("Error fetching posts:", err);
         throw new Error("Failed to fetch posts");
@@ -37,7 +37,7 @@ const resolvers = {
 const startServer = async () => {
   try {
     await connectDB();
-    await seedPosts(); 
+    await seedPosts();
 
     const server = new ApolloServer({
       typeDefs,
